@@ -1,0 +1,187 @@
+		serviço de dns
+
+sudo systemctl disable systemd-resolved.service
+-------------------------------------------------
+cat /etc/passdw | less
+
+history
+
+---------------DIRECTORY ------------------
+
+rm -R <directory>
+
+cp -r /usr/local / ls -all
+
+
+----------- instalação ambiente docker -----------------
+
+sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent 
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+sudo apt install docker-ce
+
+acessar o container -->> docker exec -it ID_CONTAINER bash
+
+---------instalar apache -------------
+
+apt-get install apache2-bin
+apt-get install apache2
+
+correção - apt-get install libapache2-mpm-itk
+
+--------teste---------
+ 
+sudo systemctl status docker ou service docker status
+
+sudo docker search debian ou ubuntu
+
+----- service docker status
+ 
+
+----- start serviço apache----------
+
+sudo /etc/init.d/apache2
+
+
+---- configuração do apache no docker -----
+
+sudo docker run -d --rm --name No-Paladar -p 8080:80 -v /home/usuario/site:/var/www/html php:5.6-apache -> arquivos devem estar na raiz da pasta site e manter /var/www/html .... 
+
+
+---------- configuração da rede - interface-------------------
+
+sudo netstat -tulpn
+
+sudo gedit /etc/network/interface
+
+------------ diretorio docker ----------------
+
+sudo rm -rf /var/lib/docker -> para deletar
+
+
+
+----------- docker compose ----------------------
+
+
+The following command will download the 1.26.0 release and save the executable file at 
+/usr/local/bin/docker-compose, which will make this software globally accessible as docker-compose:
+
+
+sudo apt-get remove docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+----------- criando diretorio apache2 ------------
+
+sudo su
+
+mkdir /etc/local/apache2 
+
+local do apache
+ /usr/local/apach2
+
+cp -r /Documents/<directoryWeb>  
+
+resolver o problema do apache2
+
+netstat -tlpn | grep 80
+
+para usar o nginx para p serviço apache
+------------ install nginx ------------
+
+sudo docker pull nginx
+sudo apt-get install nginx
+sudo nginx -t -c /etc/nginx/nginx.conf
+sudo /etc/init.d/nginx/ start
+
+
+-------------- teste de conexões -------------
+
+nslookup - server = ip e nome
+
+netstat -anu | grep 53
+
+	netstat -ant | grep 53
+
+
+------------ config dns----------------
+
+bind -> /etc/bind/
+
+configurar os arquivos - named.conf e named.conf.default-zones
+criar o arquivo db.NomeDominio.com.br
+
+named-checkconf named.conf.default-zones
+named-checkzone no-paladar.com.br db.no-paladar.com.br
+
+restart ao serviço do bind -> systemctl restart bind9
+
+------verificar a porta que funciona o DNS -----------
+
+cat /etc/services/ | grep domain
+
+------ inicia o bind junto com servidor ---------
+
+systemctl is-enable bind9.service 
+
+
+
+---------- localhost ------------
+
+/etc/resolv.conf
+
+
+----- regra de DNS -----
+
+apt-get install iptables
+
+----- travar o ping disparado contra o DNS --------
+
+iptables -I INPUT -p ICMP -j DROP
+
+iptables -I INPUT -p ICMP -j REJECT
+
+---------- aplicando regra de firewall
+
+cat /etc/services | grep domain
+
+SCRIPT ---------------
+
+#!/bin/bash
+# Limpar todas as regras pré existentes
+iptables -F
+iptables -t nat -F
+iptables -t mangle -F
+# A linha abaixo ativa o módulo do netfilter que evita ataques DoS
+echo 1 > /proc/sys/net/ipv4/tcp_syncookies
+# Liberar portas dos serviços necessários
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+iptables -A INPUT -p tcp --dport 53 -j ACCEPT
+# A linha abaixo faz o bloqueio de conexões nas demais portas
+iptables -A INPUT -p tcp --syn -j DROP
+
+
+
+------------------ CentOS -----------------------
+
+yum update
+yum upgrade
+
+yum install firewalld
+
+verificar pacotes instalado -->  yum list installed | grep firewalld
+
+--> virificar firewall = firewalld-cmd --permanent --list-all
+
+--> firewall-cmd --remove=dhcpv6 --permanent
+
+--> firewall-cmd --reload
+
+---------- ADD serviço --------
+
+firewall-cmd --add-service=nome_serviço --permanent 
+
