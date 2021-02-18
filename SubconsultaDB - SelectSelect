@@ -1,0 +1,90 @@
+--1)
+--Selecione os nomes dos jogadores que já jogaram
+--pelo menos uma vez como Pivô (posição C).
+
+
+select jogadores.nome from jogador
+	where id not in (select idjogador from detalhejogo where posicao = 'C');
+	
+--2)------------------------------------------------------------------------------------------
+
+-- Selecione os nomes dos jogadores e o número de minutos jogados
+-- para os jogadores que jogaram o menor número de minutos ao longo de todas as temporadas.	
+
+select jogador.nome as Nome_Jogador, detalhejogo.minutos as Minutos from detalhejogo
+
+	inner join jogador on jogador.id = detalhejogo.idjogador
+		where minutos = (
+							select min(detalhejogo.minutos) from detalhejogo
+							where minutos > 0 ;
+						)
+						
+--3)-----------------------------------------------------------------------------------------						
+ --Selecione os nomes dos jogadores e o número de minutos jogados 
+ --para os jogadores que jogaram o menor número de minutos na temporada 2014-2015.
+ 
+ 
+ select jogador.nome as Nome_Jogador from detalhejogo
+ 
+	inner join jogador on jogador.id = detalhejogo.idjogador
+	inner join jogo on jogo.id = detalhejogo.idjogo
+	inner join temporada on temporada.id = jogo.idtemporada
+	
+	where temporada.nome = '2014-2015' and detalhejogo.minutos = (	
+																		select min(detalhejogo.minutos)	from detalhejogo
+																		inner join jogo on jogo.id = detalhejogo.idjogo
+																		
+																		where detalhejogo.minutos > 0 and jogo.idtemporada = temporada.id
+																	
+																	)
+--4)
+--Selecione os nomes dos jogadores que jogaram 
+--no Golden State na temporada 2016-2017 e jogaram no 
+--Cleveland em qualquer outra temporada.		
+	
+select jogador.nome from jogador
+		where id in(
+						select idjogador from detalhejogo
+							inner join equipe on detalhejogo.id = detalhejogo.idjogador
+							inner join jogo on jogo.id = detalhejogo.idjogo
+							inner join temporada on temporada.id = jogo.idtemporada
+							where equipe.nome = 'Golden State' and temporada.nome '2016-2017'
+					)
+					and id in(
+								select idjogador from detalhejogo
+									inner join 	equipe on equipe.id = detalhejogo.idjogo
+									where equipe.nome = 'Cleveland'
+								)
+--5)
+	
+--Selecione os nomes dos times, os nomes dos jogadores e as respectivas posições, 
+--além do número total de pontos que marcaram na temporada 2011-2012,
+--para todos os times que jogaram como visitante contra o San Antonio em algum dia no mês de fevereiro.
+--Ordene pelo nome do time e pelo total de pontos de cada jogador, este último em ordem decrescente.	
+	
+select equipe.nome as Nome_Equipe, jogador.nome as Nome_Jogador, detalhejogo.posicao, sum(detalhejogo.pontos) as Total_Pontos
+from equipe
+
+inner join detalhejogo on detalhejogo.id = detalhejogo.idequipe
+inner join jogador on jogador.id = detalhejogo.idjogador
+inner join jogo on jogo.id = detalhejogo.idjogo
+inner join temporada on temporada.id = jogo.idtemporada
+
+	where temporada.nome = '2011-2012' and equipe.id in(
+	select jogo.idtimevisitante from jogo 
+
+		inner join detalhejogo on jogo.id = detalhejogo.idjogo
+		inner join equipe on equipe.id = detalhejogo.idequipe and equipe.id = jogo.idtimevisitante
+		
+		where jogo.idtemporada = temporada.id and equipe.nome = 'San Antonio' and month(jogo.datarealizacao) = 2	
+	)
+	group by equipe.nome, jogador.nome, detalhejogo.posicao
+	order by equipe.nome, Total_Pontos desc;
+
+		
+	
+
+	
+	
+	
+ 

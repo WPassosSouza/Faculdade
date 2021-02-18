@@ -1,0 +1,14 @@
+create view Medias_Jogador_Por_Temporada as select detalhejogo.idjogador, jogador.nome, temporada.id, temporada.nome,
+
+        avg(cast(detalhejogo.rebotesofensivos as numeric(15,10))) as media_rebotes_ofensivos,
+        avg(cast(detalhejogo.rebotesdefensivos as numeric(15,10))) as media_rebotes_defensivos,
+        avg(cast(pontos as numeric(15,10))) as media_pontos,
+        avg(cast(minutos as numeric(15,10))) as media_minutos,
+        avg(cast(tocos as numeric(15,10))) as media_tocos,
+        avg(cast(assistencias as numeric(15,10))) as media_assistencias from  detalhejogo 
+		
+        inner join jogo on detalhejogo.idjogo = jogo.id
+        inner join temporada as temporada on jogo.idtemporada = temporada.id
+        inner join jogador on detalhejogo.idjogador = jogo.id
+		
+		group  by detalhejogo.idjogador, jogo.nome, temporada.id, temporada.nome

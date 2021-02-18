@@ -1,0 +1,63 @@
+--1
+--Selecione o nome do jogador, a(s) temporada(s) e a quantidade de 
+--rebotes pegos pelo jogador, para a(s) temporada(s) onde esse jogador
+--pegou seu maior número de rebotes em um único jogo. 
+--Se houver mais de uma ocorrência em uma mesma temporada,
+--apenas uma deve ser mostrada. 
+--Ordene pelo nome do jogador e depois pela temporada.
+
+select distinct jogador.nome as Nome_Jogador, temporada.nome as Nome_Temporada, detalhejogo.rebotestotal from jogador
+	
+	inner join detalhejogo on detalhejogo.id = detalhejogo.idjogador
+	inner join detalhejogo on detalhejogo.idjogo = detalhejogo.idjogo
+	inner join temporada on jogo.idtemporada = temporada.id
+	
+	where detalhejogo.rebotestotal = (select max(detalhejogo.rebotestotal) from detalhejogo
+										
+										where detalhejogo.idjogador = jogo.id
+										
+										)
+	order by jogador.nome, temporada.nome;
+
+--2
+--Selecione o nome dos jogadores que tenham como maior número de
+--assistências em um mesmo jogo um valor igual à média de assistências do jogador
+--Chris Paul. Ordene pelo nome do jogador.
+
+select jogador.nome as Nome_Jogador from jogadores
+
+	inner join detalhejogo on detalhejogo.id = detalhejogo.idjogador
+	group by jogador.nome
+
+having max(detalhejogo.assistências) = (select avg(detalhejogo.assistências) from detalhejogo	
+											inner join jogador on detalhejogo.idjogador = jogador.id
+											
+											where jogador.nome = 'Chris Paul'
+											)
+
+order by jogador.nome;
+
+--3
+--Selecione o nome dos jogadores que não jogaram a temporada 
+--2015-2016 pelo Golden State, 
+--mas jogaram a temporada 2016-2017 por essa equipe.
+
+select distinct jogador.nome as Nome_Jogador from jogador
+														
+		inner join detalhejogo on jogador.id =detalhejogo.idjogador
+		inner join equipe on detalhejogo.idequipe = equipe.id
+		inner join jogo on detalhejogo.idjogo = jogo.id
+		inner join temporada on temporada.id = jogo.idtemporada
+		
+	where equipe.nome = 'Golden State' and temporada.nome '2016-2017' and jogador.id not in(select jogador.id from detalhejogo
+																								inner join detalhejogo on jogador.id =detalhejogo.idjogador
+																								inner join equipe on detalhejogo.idequipe = equipe.id
+																								inner join jogo on detalhejogo.idjogo = jogo.id
+																								inner join temporada on temporada.id = jogo.idtemporada
+																								where equipe.nome = 'Golden State' and temporada.nome = '2015-2016'
+                        											
+																									
+																								)
+	
+	
+																															

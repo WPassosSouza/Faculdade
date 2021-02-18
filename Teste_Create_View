@@ -1,0 +1,9 @@
+create view Mostra_Tabela_de_Teste as select Coluna1.Nome as Coluna1, Coluna2.Nome as Coluna2, Coluna3.calculo as Coluna3, avg(detalhe.pontos) from Junção_1
+
+	inner join Junção_1 on Junção_2.idTeste = Junção_1.id
+	
+	where Coluna2.nome like %a and Coluna3.calculo select avg(Coluna3.calculo) > 6 
+	group by Coluna1, Coluna2;
+
+	
+	

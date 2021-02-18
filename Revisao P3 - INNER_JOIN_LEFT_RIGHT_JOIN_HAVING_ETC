@@ -1,0 +1,53 @@
+--1
+ --Selecione os nomes de todos os jogadores 
+ --e o total de minutos jogados para todos os jogadores
+ --que jogaram ao menos 48 minutos pelo San Antonio na temporada 2013-2014. 
+ --Ordene pelo nome do jogador.
+
+select    jogador.nome as Nome_Jogador, sum(detalhejogo.minutos) as total_minutos from jogador 
+        
+		inner join detalhejogo on jogador.id = detalhejogo.idjogador
+        inner join equipe on equipe.id = detalhejogo.idequipe
+        inner join jogo on jogo.id = detalhejogo.idjogo
+        inner join temporada on temporada.id = jogo.idtemporada
+		
+where    temporada.nome = '2013-2014' and equipe.nome = 'San Antonio'
+group    by jogador.nome
+having sum(detalhejogo.minutos) > 48
+order    by jogador.nome
+
+
+--2
+
+--Selecione os nomes de todos os times da casa,
+--a data dos jogos e os nomes das equipes visitantes
+--em todos os casos em que o time da casa marcou 100 pontos ou mais.
+--Ordene pela data do jogo, de forma que os jogos mais recentes apareçam primeiro. 
+--Jogos que tenham ocorrido no mesmo dia devem ser ordenados pelo nome do time visitante.
+
+select equipe.nome as time_casa, jogo.datarealizacao as datarealizacao, equipe.nome as time_visitante from equipe 
+        
+		inner join jogo on equipe.id = jogo.idtimecasa
+        inner join equipe on equipe.id = jogo.idtimevisitante
+		
+where	jogo.pontostimecasa > 99
+order	by jogo.datarealizacao desc, equipe.nome;
+
+
+--3
+
+--Selecione os nomes de todos os jogadores e o 
+--total de minutos que eles jogaram no dia de natal
+--ao longo dos anos. Jogadores que nunca jogaram nesta data 
+--também devem aparecer no resultado. Ordene pelo total de minutos
+--e pelo nome do jogador, de forma que os jogadores que jogaram mais vezes
+--apareçam no início da listagem de saída.
+
+select jogadores.nome, isnull(sum(detalhejogo.minutos), 0) as total_minutos
+from    detalhejogo
+        inner join jogo on jogo.id = detalhejogo.idjogo
+        right join jogador on jogo.id = detalhejogo.idjogador
+        and month(jogo.datarealizacao) = 12
+        and day(jogo.datarealizacao) = 25
+group    by jogadores.nome
+order    by total_minutos desc
